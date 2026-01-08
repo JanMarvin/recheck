@@ -43,7 +43,7 @@ recheck <- function(sourcepkg, which = "strong", check_bioc = FALSE, preinstall_
     Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
     if(.Platform$OS.type == 'windows') Sys.setenv(TAR = 'internal')
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),
-                                 reverse = list(repos = cranrepo, which = which),
+                                 reverse = list(repos = repos, which = which),
                                  Ncpus = parallel::detectCores(),
                                  check_args = check_args)
   })
