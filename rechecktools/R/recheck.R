@@ -56,16 +56,6 @@ recheck <- function(sourcepkg, which = "strong", check_bioc = FALSE, preinstall_
     writeLines(paste(format(details), collapse = "\n\n"), file.path(checkdir, 'check-details.txt'))
     print(details)
   })
-  group_output("Reverse dependency test warnings", {
-    test_warnings <- collect_test_warnings(checkdir)
-    if(is.null(test_warnings) || nrow(test_warnings) == 0){
-      message("No warnings detected in reverse dependency tests")
-    } else {
-      write.csv(test_warnings, file.path(checkdir, 'revdep-test-warnings.csv'),
-                row.names = FALSE)
-      print(aggregate(warning ~ package, test_warnings, length))
-    }
-  })
   tools::summarize_check_packages_in_dir_results(checkdir)
 }
 
@@ -94,24 +84,4 @@ test_recheck <- function(pkg, which = 'strong'){
   dir.create(checkdir)
   utils::download.packages(pkg, checkdir, repos = 'https://cloud.r-project.org')
   recheck(list.files(checkdir, pattern = 'tar.gz$', full.names = TRUE), which = which)
-}
-
-collect_test_warnings <- function(checkdir) {
-  rchecks <- list.dirs(checkdir, recursive = FALSE)
-  res <- lapply(rchecks, function(dir) {
-    test_dir <- file.path(dir, "tests")
-    if (!dir.exists(test_dir)) return(NULL)
-    routs <- list.files(test_dir, pattern = "\\.Rout", full.names = TRUE)
-    if (!length(routs)) return(NULL)
-    warnings <- unlist(lapply(routs, function(f) {
-      lines <- readLines(f, warn = FALSE)
-      grep("(?i)warning", lines, value = TRUE, perl = TRUE)
-    }))
-    if (length(warnings)) {
-      data.frame(package = sub("\\.Rcheck$", "", basename(dir)),
-                 warning = warnings,
-                 stringsAsFactors = FALSE)
-    } else NULL
-  })
-  do.call(rbind, res)
 }
