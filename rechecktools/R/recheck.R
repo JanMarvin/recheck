@@ -41,6 +41,9 @@ recheck <- function(sourcepkg, which = "strong", check_bioc = FALSE, preinstall_
   }
   group_output("Running checks", {
     Sys.setenv('_R_CHECK_FORCE_SUGGESTS_' = 'false')
+    Sys.setenv('_R_CHECK_TESTS_NLINES_' = '0') # show warnings
+    Sys.setenv('_R_CHECK_NO_STOP_ON_TEST_ERROR_' = 'true')
+    Sys.setenv('_R_CHECK_ALWAYS_LOG_VIGNETTE_OUTPUT_' = 'true')
     if(.Platform$OS.type == 'windows') Sys.setenv(TAR = 'internal')
     tools::check_packages_in_dir(checkdir, basename(sourcepkg),
                                  reverse = list(repos = repos, which = which),
